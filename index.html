@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Life OS — Organize What Matters</title>
+  <meta name="description" content="Life OS turns scattered responsibilities, goals, routines, and thoughts into a clear plan for what matters now.">
+  <meta name="theme-color" content="#0b0f14">
+  <meta property="og:title" content="Life OS — Organize What Matters">
+  <meta property="og:description" content="Dump the chaos. Life OS helps turn it into clear next actions.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230b0f14%22/><text x=%2232%22 y=%2241%22 font-size=%2230%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22>OS</text></svg>">
+ <style>
+  :root{
+   --bg:#0b0f14;
+   --panel:#111821;
+   --panel2:#151f2b;
+   --text:#f7f9fb;
+   --muted:#9ba8b7;
+   --line:#263242;
+   --accent:#ffffff;
+   --success:#8ef0b0;
+   --danger:#ff9e9e;
+   --shadow:0 20px 50px rgba(0,0,0,.35);
+   --radius:20px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+   margin:0;
+   font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+   background:
+    radial-gradient(circle at 10% 10%, rgba(255,255,255,.055), transparent 25%),
+    radial-gradient(circle at 90% 20%, rgba(255,255,255,.035), transparent 30%),
+    var(--bg);
+   color:var(--text);
+  }
+  button,input,textarea{font:inherit}
+  .wrap{max-width:1200px;margin:0 auto;padding:24px}
+  .topbar{
+   position:sticky;top:0;z-index:10;
+   backdrop-filter:blur(16px);
+   background:rgba(11,15,20,.76);
+   border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .nav{
+   max-width:1200px;margin:0 auto;padding:14px 24px;
+   display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .brand{font-weight:900;letter-spacing:.08em}
+  .brand span{opacity:.55;font-weight:700}
+  .navlinks{display:flex;gap:8px;flex-wrap:wrap}
+  .navlinks a{
+   color:var(--muted);text-decoration:none;padding:9px 12px;border-radius:12px
+  }
+  .navlinks a:hover{background:var(--panel);color:var(--text)}
+  .hero{
+   min-height:70vh;display:grid;place-items:center;text-align:center;padding:64px 0 30px
+  }
+  .hero-inner{max-width:850px}
+  .eyebrow{
+   display:inline-flex;border:1px solid var(--line);border-radius:999px;
+   padding:7px 12px;color:var(--muted);font-size:.9rem;background:rgba(255,255,255,.025)
+  }
+  h1{font-size:clamp(3rem,8vw,7rem);line-height:.9;margin:24px 0 20px;letter-spacing:-.06em}
+  .hero p{font-size:1.2rem;color:var(--muted);max-width:700px;margin:0 auto 28px}
+  .cta-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+  .btn{
+   border:0;border-radius:14px;padding:12px 16px;cursor:pointer;font-weight:800;
+   background:#fff;color:#0a0f14
+  }
+  .btn.secondary{background:var(--panel);color:var(--text);border:1px solid var(--line)}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+  .section{padding:56px 0}
+  .section h2{font-size:clamp(2rem,4vw,3.4rem);margin:0 0 10px;letter-spacing:-.04em}
+  .sub{color:var(--muted);margin:0 0 26px}
+  .grid{display:grid;gap:16px}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .grid-2{grid-template-columns:repeat(2,1fr)}
+  .card{
+   background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));
+   border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)
+  }
+  .card h3{margin:0 0 8px}
+  .muted{color:var(--muted)}
+  .command{
+   display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:26px
+  }
+  .priority{
+   display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)
+  }
+  .priority:last-child{border-bottom:0}
+  .dot{width:10px;height:10px;border-radius:50%;background:#fff}
+  .dot.dim{opacity:.35}
+  .brain textarea{
+   width:100%;min-height:150px;background:#0d131b;color:var(--text);
+   border:1px solid var(--line);border-radius:16px;padding:16px;resize:vertical;outline:none
+  }
+  .brain textarea:focus{border-color:#4d627a}
+  .output{
+   margin-top:14px;padding:14px;border-radius:14px;background:#0d131b;border:1px solid var(--line);display:none
+  }
+  .privacy-note{
+   margin-top:12px;
+   color:var(--muted);
+   font-size:.82rem;
+   letter-spacing:.01em
+  }
+  .mini-label{
+   display:inline-flex;align-items:center;gap:7px;
+   padding:6px 9px;border:1px solid var(--line);border-radius:999px;
+   color:var(--muted);font-size:.78rem;background:rgba(255,255,255,.02)
+  }
+  .smart-grid{
+   display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px
+  }
+  .smart-field{
+   background:#0d131b;border:1px solid var(--line);border-radius:14px;padding:12px
+  }
+  .smart-field label{
+   display:block;font-size:.72rem;color:var(--muted);text-transform:uppercase;
+   letter-spacing:.12em;font-weight:800;margin-bottom:7px
+  }
+  .smart-field select,.smart-field input{
+   width:100%;background:transparent;border:0;outline:0;color:var(--text)
+  }
+  .locked-row{
+   display:flex;align-items:center;justify-content:space-between;gap:14px;
+   padding:13px 0;border-bottom:1px solid var(--line)
+  }
+  .locked-row:last-child{border-bottom:0}
+  .lock-pill{
+   font-size:.78rem;border:1px solid var(--line);border-radius:999px;
+   padding:6px 9px;color:var(--muted);white-space:nowrap
+  }
+  .lock-pill.locked{color:#fff}
+  .suggestion{
+   padding:16px;border:1px solid var(--line);border-radius:16px;background:#0d131b;margin-top:12px
+  }
+  .suggestion-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .tiny-btn{
+   border:1px solid var(--line);background:transparent;color:var(--text);
+   padding:8px 10px;border-radius:10px;cursor:pointer;font-weight:700
+  }
+  .tiny-btn.primary{background:#fff;color:#0a0f14}
+  .feature-law{
+   display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)
+  }
+  .feature-law:last-child{border-bottom:0}
+  .check{
+   width:24px;height:24px;border-radius:8px;border:1px solid var(--line);
+   display:grid;place-items:center;flex:0 0 auto;font-size:.8rem
+  }
+  .status-line{
+   margin-top:12px;color:var(--muted);font-size:.9rem
+  }
+  @media(max-width:850px){
+   .smart-grid{grid-template-columns:1fr 1fr}
+  }
+
+  .section-kicker{
+   font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+   color:var(--muted);font-weight:800;margin-bottom:9px
+  }
+  .tag{
+   display:inline-block;padding:6px 9px;margin:5px 6px 0 0;border-radius:999px;
+   border:1px solid var(--line);font-size:.84rem;color:var(--muted)
+  }
+  .stat{
+   font-size:2rem;font-weight:900;letter-spacing:-.04em
+  }
+  .bar{height:10px;background:#0d131b;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+  .bar > div{height:100%;width:62%;background:#fff}
+  .pricing .card{position:relative}
+  .popular{
+   outline:2px solid rgba(255,255,255,.75);
+   transform:translateY(-6px)
+  }
+  .badge{
+   position:absolute;top:14px;right:14px;font-size:.76rem;padding:5px 8px;border-radius:999px;
+   background:#fff;color:#0a0f14;font-weight:900
+  }
+  .price{font-size:2.5rem;font-weight:900;margin:12px 0 4px}
+  .price small{font-size:.9rem;color:var(--muted);font-weight:600}
+  ul{padding-left:18px;color:var(--muted)}
+  li{margin:9px 0}
+  .plan-status{
+   margin-top:18px;padding:12px;border-radius:14px;background:#0d131b;border:1px solid var(--line);color:var(--muted)
+  }
+  .footer{padding:40px 0 60px;color:var(--muted);text-align:center}
+  .modal{
+   position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;z-index:40;padding:20px
+  }
+  .modal.open{display:grid}
+  .modal-box{
+   width:min(520px,100%);background:#101720;border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)
+  }
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+  @media(max-width:850px){
+   .grid-3,.grid-2,.command{grid-template-columns:1fr}
+   .popular{transform:none}
+   .nav{align-items:flex-start}
+   .navlinks{justify-content:flex-end}
+  }
+ 
+    .install-banner{
+      position:fixed;left:14px;right:14px;bottom:14px;z-index:100;
+      max-width:680px;margin:auto;
+      background:#111821;border:1px solid #2a3745;border-radius:18px;
+      padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.45);
+      display:none;align-items:center;justify-content:space-between;gap:12px
+    }
+    .install-banner.show{display:flex}
+    .install-banner strong{display:block}
+    .install-banner span{display:block;color:#9ba8b7;font-size:.86rem;margin-top:2px}
+    .install-actions{display:flex;gap:8px;flex-shrink:0}
+    .install-mini{
+      border:1px solid #2a3745;background:transparent;color:#fff;
+      padding:9px 11px;border-radius:11px;font-weight:800;cursor:pointer
+    }
+    .install-mini.primary{background:#fff;color:#0a0f14;border-color:#fff}
+
+  </style>
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Life OS">
+
+</head>
+<body>
+ <header class="topbar">
+  <div class="nav">
+   <div class="brand">LIFE <span>OS</span></div>
+   <nav class="navlinks">
+    <a href="#dashboard">Dashboard</a>
+    <a href="#brain">Brain Dump</a>
+    <a href="#goals">Goals</a>
+    <a href="#pricing">Memberships</a>
+   </nav>
+  </div>
+ </header>
+
+ <main class="wrap">
+  <section class="hero">
+   <div class="hero-inner">
+    <div class="eyebrow">Private by default • Built around real life</div>
+    <h1>Stop managing chaos.</h1>
+    <p>Life OS turns responsibilities, goals, routines, plans, and loose thoughts into one simple answer: <strong style="color:white">what matters now?</strong></p>
+    <div class="cta-row">
+     <a class="btn" href="#dashboard" style="text-decoration:none">Open Life OS</a>
+     <a class="btn secondary" href="#pricing" style="text-decoration:none">View Memberships</a>
+    </div>
+   </div>
+  </section>
+
+  <section class="section" id="dashboard">
+   <div class="section-kicker">Dashboard</div>
+   <h2>Command Center</h2>
+   <p class="sub">One screen. No clutter. Just your next move.</p>
+
+   <div class="command">
+    <div class="card">
+     <h3>What matters now?</h3>
+     <div class="priority"><span class="dot"></span><div><strong>MUST DO</strong><div class="muted">Finish the highest-pressure task first.</div></div></div>
+     <div class="priority"><span class="dot dim"></span><div><strong>SHOULD DO</strong><div class="muted">Move one long-term goal forward.</div></div></div>
+     <div class="priority"><span class="dot dim"></span><div><strong>CAN WAIT</strong><div class="muted">Low-impact tasks get pushed automatically.</div></div></div>
+    </div>
+
+    <div class="card">
+     <div class="muted">TODAY</div>
+     <div class="stat">62%</div>
+     <p class="muted">3 of 5 priority actions complete.</p>
+     <div class="bar"><div></div></div>
+     <div class="plan-status">Current plan: <strong style="color:white">Free</strong> <span class="mini-label" style="margin-left:8px">Active</span></div>
+     <button class="btn secondary" style="width:100%;margin-top:12px" onclick="rebuildDay()">Rebuild My Day</button>
+     <div class="status-line" id="rebuildStatus">Flexible items can move. Locked events never move without you.</div>
+    </div>
+   </div>
+
+   <div class="grid grid-2" style="margin-top:16px">
+    <div class="card">
+     <div class="section-kicker">Schedule Safety</div>
+     <h3>Locked vs Flexible</h3>
+     <div class="locked-row">
+      <div><strong>Fixed appointment</strong><div class="muted">Cannot move automatically</div></div>
+      <span class="lock-pill locked">🔒 Locked</span>
+     </div>
+     <div class="locked-row">
+      <div><strong>Deep work block</strong><div class="muted">Can shift if the day changes</div></div>
+      <span class="lock-pill">Flexible</span>
+     </div>
+     <div class="locked-row">
+      <div><strong>Personal task</strong><div class="muted">Move only when useful</div></div>
+      <span class="lock-pill">Flexible</span>
+     </div>
+    </div>
+
+    <div class="card">
+     <div class="section-kicker">Approval First</div>
+     <h3>Life OS suggests. You decide.</h3>
+     <div class="suggestion" id="suggestionCard">
+      <strong>Suggested change</strong>
+      <p class="muted" style="margin:8px 0 0">Move a flexible focus block later to protect a more urgent deadline.</p>
+      <div class="suggestion-actions">
+       <button class="tiny-btn primary" onclick="setSuggestion('Accepted')">Accept</button>
+       <button class="tiny-btn" onclick="setSuggestion('Change requested')">Change</button>
+       <button class="tiny-btn" onclick="setSuggestion('Kept original')">Keep original</button>
+      </div>
+      <div class="status-line" id="suggestionStatus">No change has been made yet.</div>
+     </div>
+    </div>
+   </div>
+  </section>
+
+  <section class="section brain" id="brain">
+   <div class="section-kicker">Capture</div>
+   <h2>Dump the chaos.</h2>
+   <p class="sub">Write what is competing for your attention. Life OS turns the mess into a clear next move.</p>
+   <div class="card">
+    <textarea id="dump" placeholder="Example: I have a deadline Friday, an appointment tomorrow, need to follow up with someone, and want to make progress on a savings goal..."></textarea>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+     <button class="btn" onclick="organize()">Organize My Life</button>
+     <button class="btn ghost" onclick="document.getElementById('dump').value=''">Clear</button>
+    </div>
+    <div class="privacy-note">🔒 Your text stays in your browser and is not sent anywhere.</div>
+    <div class="output" id="output">
+     <strong>Life OS organized it:</strong>
+     <div><span class="tag">Do now</span><span class="tag">Schedule</span><span class="tag">Goal</span><span class="tag">Reminder</span><span class="tag">People</span></div>
+     <p class="muted" id="summary" style="margin-bottom:0"></p>
+
+     <div class="smart-grid">
+      <div class="smart-field">
+       <label>Importance</label>
+       <select><option>High</option><option>Medium</option><option>Low</option></select>
+      </div>
+      <div class="smart-field">
+       <label>Energy</label>
+       <select><option>Medium</option><option>High</option><option>Low</option></select>
+      </div>
+      <div class="smart-field">
+       <label>Flexibility</label>
+       <select><option>Flexible</option><option>Fixed</option></select>
+      </div>
+      <div class="smart-field">
+       <label>Time</label>
+       <input value="30 min" />
+      </div>
+     </div>
+     <p class="muted" style="margin:12px 0 0;font-size:.88rem">Life OS asks as little as possible, infers what it can, and lets you correct anything.</p>
+    </div>
+   </div>
+  </section>
+
+  <section class="section" id="goals">
+   <div class="section-kicker">Direction</div>
+   <h2>Goals → next actions.</h2>
+   <p class="sub">Big goals are useless if you never know the next move.</p>
+   <div class="grid grid-3">
+    <div class="card">
+     <h3>Responsibilities</h3>
+     <p class="muted">Deadlines, tasks, appointments, and commitments.</p>
+     <div class="bar"><div style="width:74%"></div></div>
+    </div>
+    <div class="card">
+     <h3>Goals & Projects</h3>
+     <p class="muted">Long-term goals, creative work, and personal projects.</p>
+     <div class="bar"><div style="width:41%"></div></div>
+    </div>
+    <div class="card">
+     <h3>Wellbeing</h3>
+     <p class="muted">Routines, rest, habits, and personal wellbeing.</p>
+     <div class="bar"><div style="width:58%"></div></div>
+    </div>
+   </div>
+  </section>
+
+  
+  <section class="section">
+   <div class="section-kicker">Product Rules</div>
+   <h2>Built from what users hate.</h2>
+   <p class="sub"> avoids the mistakes people keep complaining about in productivity apps.</p>
+   <div class="grid grid-2">
+    <div class="card">
+     <div class="feature-law"><div class="check">✓</div><div><strong>No organizer-for-the-organizer</strong><div class="muted">Dump the chaos first. Structure comes after.</div></div></div>
+     <div class="feature-law"><div class="check">✓</div><div><strong>No feature overload</strong><div class="muted">Home stays focused on Must Do, Should Do, Can Wait.</div></div></div>
+     <div class="feature-law"><div class="check">✓</div><div><strong>Mobile-first</strong><div class="muted">Phone users get the real product, not a weaker companion app.</div></div></div>
+    </div>
+    <div class="card">
+     <div class="feature-law"><div class="check">✓</div><div><strong>AI never silently changes fixed plans</strong><div class="muted">Locked events require user approval.</div></div></div>
+     <div class="feature-law"><div class="check">✓</div><div><strong>Free stays genuinely useful</strong><div class="muted">Membership adds intelligence and automation, not basic usability.</div></div></div>
+     <div class="feature-law"><div class="check">✓</div><div><strong>Every feature must reduce effort</strong><div class="muted">If it creates more setup than value, it does not belong.</div></div></div>
+    </div>
+   </div>
+  </section>
+
+<section class="section pricing" id="pricing">
+   <div class="section-kicker">Plans</div>
+   <h2>Memberships</h2>
+   <p class="sub">Start free. Upgrade when Life OS becomes part of your everyday life.</p>
+   <div class="grid grid-3">
+    <div class="card">
+     <h3>FREE</h3>
+     <div class="price">$0 <small>/ month</small></div>
+     <ul>
+      <li>Daily Command</li>
+      <li>Brain Dump</li>
+      <li>Unlimited standard goals</li>
+      <li>Basic weekly reset</li>
+      <li>Locked events</li>
+      <li>Manual Rebuild My Day</li>
+     </ul>
+     <button class="btn secondary" onclick="choosePlan('Free', 0)">Start Free</button>
+    </div>
+
+    <div class="card popular">
+     <div class="badge">MOST POPULAR</div>
+     <h3>LIFE OS+</h3>
+     <div class="price">$7.99 <small>/ month</small></div>
+     <ul>
+      <li>Everything in Free</li>
+      <li>Automatic day rebuilding</li>
+      <li>Smart priority suggestions</li>
+      <li>Energy-aware planning</li>
+      <li>Life-area tracking</li>
+      <li>Advanced weekly reports</li>
+     </ul>
+     <button class="btn" onclick="choosePlan('Life OS+', 7.99)">Join OS+ Waitlist</button>
+    </div>
+
+    <div class="card">
+     <h3>LIFE OS PRO</h3>
+     <div class="price">$14.99 <small>/ month</small></div>
+     <ul>
+      <li>Everything in OS+</li>
+      <li>Deep goal planning</li>
+      <li>Project workspaces</li>
+      <li>Advanced planning insights</li>
+      <li>Extended planning history</li>
+      <li>Custom Life OS setup</li>
+     </ul>
+     <button class="btn secondary" onclick="choosePlan('Life OS Pro', 14.99)">Join Pro Waitlist</button>
+    </div>
+   </div>
+   <p class="muted" style="margin-top:16px">Paid memberships are opening soon. Start with Life OS Free today.</p>
+  </section>
+
+  <section class="section">
+   <div class="card">
+    <h2 style="margin-top:0">Weekly Reset</h2>
+    <p class="muted">Life OS shows what you completed, what keeps getting delayed, when your plans were unrealistic, and what should matter next week.</p>
+    <div class="grid grid-3">
+     <div><div class="stat">12</div><div class="muted">Completed</div></div>
+     <div><div class="stat">3</div><div class="muted">Postponed</div></div>
+     <div><div class="stat">1</div><div class="muted">Main focus next week</div></div>
+    </div>
+   </div>
+  </section>
+
+  <footer class="footer">© 2026 Life OS. Built for clarity, not clutter.</footer>
+ </main>
+
+ <div class="modal" id="modal">
+  <div class="modal-box">
+   <h3 id="modalTitle">Membership selected</h3>
+   <p class="muted" id="modalText"></p>
+   <div class="modal-actions">
+    <button class="btn ghost" onclick="closeModal()">Close</button>
+    <button class="btn" id="modalPrimary" onclick="activatePlan()">Continue</button>
+   </div>
+  </div>
+ </div>
+
+ <script>
+  let selectedPlan = "Free";
+
+  function organize(){
+   const text = document.getElementById("dump").value.trim();
+   const output = document.getElementById("output");
+   const summary = document.getElementById("summary");
+   if(!text){
+    summary.textContent = "Add a few things you need to handle first.";
+   } else {
+    const count = text.split(/,| and |\n/).filter(Boolean).length;
+    summary.textContent = `I found about ${count} separate items. Life OS ranks urgency, identifies time-specific items, and turns longer-term items into goals or scheduled actions.`;
+   }
+   output.style.display = "block";
+  }
+
+  function choosePlan(plan, price){
+   selectedPlan = plan;
+   document.getElementById("modalTitle").textContent = price === 0 ? "Start with Life OS Free" : `${plan} is coming soon`;
+   document.getElementById("modalText").textContent =
+    price === 0
+    ? "Start with the core Life OS experience."
+    : `Launch pricing is $${price}/month. Online checkout is not enabled on this site yet.`;
+   document.getElementById("modal").classList.add("open");
+  }
+
+  function closeModal(){
+   document.getElementById("modal").classList.remove("open");
+  }
+
+  function rebuildDay(){
+   const el = document.getElementById("rebuildStatus");
+   el.textContent = "Day rebuilt: flexible items were re-ranked by urgency, importance, energy, and available time. Locked events stayed untouched.";
+  }
+
+  function setSuggestion(status){
+   document.getElementById("suggestionStatus").textContent = status + ".";
+  }
+
+  function activatePlan(){
+   if(selectedPlan !== "Free"){
+    document.getElementById("modalText").textContent = "Paid memberships are not open for checkout yet. You can still explore the full site and start with Free.";
+    document.getElementById("modalPrimary").textContent = "Start Free";
+    selectedPlan = "Free";
+    return;
+   }
+   document.querySelector(".plan-status").innerHTML =
+    `Current plan: <strong style="color:white">Free</strong> <span class="mini-label" style="margin-left:8px">Active</span>`;
+   closeModal();
+   document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});
+  }
+ </script>
+
+  <div class="install-banner" id="installBanner">
+    <div>
+      <strong>Install Life OS</strong>
+      <span id="installText">Add Life OS to your Home Screen.</span>
+    </div>
+    <div class="install-actions">
+      <button class="install-mini" onclick="hideInstall()">Later</button>
+      <button class="install-mini primary" id="installButton" onclick="installLifeOS()">Install</button>
+    </div>
+  </div>
+
+
+<script>
+  let deferredInstallPrompt = null;
+
+  function isIOS() {
+    return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  }
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true;
+  }
+
+  function showInstallBanner() {
+    if (isStandalone() || localStorage.getItem('lifeos_install_dismissed') === '1') return;
+    const banner = document.getElementById('installBanner');
+    const text = document.getElementById('installText');
+    const button = document.getElementById('installButton');
+
+    if (isIOS()) {
+      text.textContent = 'On iPhone: tap Share, then Add to Home Screen.';
+      button.textContent = 'How';
+    } else {
+      text.textContent = 'Install Life OS for quick Home Screen access.';
+      button.textContent = 'Install';
+    }
+    banner.classList.add('show');
+  }
+
+  function hideInstall() {
+    document.getElementById('installBanner').classList.remove('show');
+    localStorage.setItem('lifeos_install_dismissed', '1');
+  }
+
+  async function installLifeOS() {
+    if (isIOS()) {
+      alert('In Safari, tap the Share button, choose “Add to Home Screen,” then tap Add.');
+      return;
+    }
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    } else {
+      alert('Use your browser menu and choose “Install app” or “Add to Home Screen.”');
+    }
+  }
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    showInstallBanner();
+  });
+
+  window.addEventListener('load', () => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js');
+    }
+    setTimeout(showInstallBanner, 1200);
+  });
+</script>
+
+</body>
+</html>
